@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%p %c{2} - %m%n</pattern>
+    </encoder>
+  </appender>
+  <logger name="org.apache.http.wire" level="TRACE"/>
+  <logger name="httpclient.wire" level="TRACE"/>
+  <logger name="httpclient.wire.header" level="TRACE"/>
+  <logger name="com.ning" level="DEBUG"/>
+  <logger name="com.google.code.jerseyclients" level="DEBUG"/>
+  <logger name="com.ning.http.client.providers.netty.NettyAsyncHttpProvider" level="DEBUG"/>  
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+  </root>
+</configuration>

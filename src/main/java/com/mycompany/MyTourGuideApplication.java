@@ -2,12 +2,14 @@ package com.mycompany;
 
 import java.net.URI;
 
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
@@ -15,7 +17,7 @@ public class MyTourGuideApplication {
 
 	@Bean
 	public RestTemplate restTemplate() {
-		return new RestTemplate();
+		return new RestTemplate(clientFactory());
 	}
 	
 	@Bean
@@ -52,6 +54,22 @@ public class MyTourGuideApplication {
 	@Bean
 	public PlacesService placeService() {
 		return new PlacesService();
+	}
+	
+	@Bean
+	public WhispirService whispirService() {
+		return new WhispirService();
+	}
+	
+	@Bean 
+	public HttpComponentsClientHttpRequestFactory clientFactory() {
+		HttpComponentsClientHttpRequestFactory http = new HttpComponentsClientHttpRequestFactory();
+		
+		http.setHttpClient(HttpClients.createMinimal());
+		http.setConnectTimeout(0);
+		http.setConnectionRequestTimeout(0);
+		http.setReadTimeout(0);
+		return http;
 	}
 	
     public static void main(String[] args) {

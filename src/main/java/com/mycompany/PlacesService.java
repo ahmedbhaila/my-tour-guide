@@ -1,7 +1,5 @@
 package com.mycompany;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -13,15 +11,24 @@ public class PlacesService {
 	@Autowired
 	RedisTemplate<String, String> redisTemplate;
 	
-	public void getPlaceData(String latLng) {
+	public void getPlaceData(String latLng, boolean refresh) {
 		Long size = redisTemplate.opsForList().size(latLng + ":images");
-		if(size == 0) {
-			List<String> imageUrls = placeService.getImageUrls(latLng);
-			imageUrls.forEach(url -> redisTemplate.opsForList().leftPush(latLng + ":images", url));
+		if(refresh || size == 0) {
+			placeService.setupCityData(latLng);
 		}
 	}
 	
-	public List<String> getPlaceImages(String latLng) {
-		return redisTemplate.opsForList().range(latLng + ":images", 0, -1);
+	public CityInfo getPlaceData(String latLng) {
+		
+		CityInfo cityInfo = new CityInfo();
+		cityInfo.setImages(redisTemplate.opsForList().range(latLng + ":images", 0, -1));
+		cityInfo.setCityName((String)redisTemplate.opsForHash().get(latLng, "city"));
+		cityInfo.setAboutCity((String)redisTemplate.opsForHash().get(latLng, "about"));
+		return cityInfo;
 	}
+	
+	public void setupCityMonumentData(String latLng) {
+		placeService.setupCityMonumentData(latLng);
+	}
+	
 }
