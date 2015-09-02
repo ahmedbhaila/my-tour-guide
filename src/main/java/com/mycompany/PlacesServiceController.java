@@ -60,7 +60,7 @@ public class PlacesServiceController {
 	
 	@RequestMapping(value="/handleCallback", method = RequestMethod.GET)
 	@ResponseBody
-	public void handleCallback(@RequestBody String message, @RequestParam(required=false, defaultValue="false", value="auth") String auth) {
-		System.out.println("call backed message is " + message);
+	public void handleCallback(@RequestParam(required=false, defaultValue="false", value="auth") String auth) {
+		System.out.println("call backed");
 	}
 }
