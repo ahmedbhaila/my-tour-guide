@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -jar target/my-tour-guide-0.0.1-SNAPSHOT.jar
+web: java -Dserver.port=$PORT -jar target/mytourguide-0.0.1-SNAPSHOT.jar
