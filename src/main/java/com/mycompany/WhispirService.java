@@ -44,6 +44,21 @@ public class WhispirService {
 		ResponseEntity<String> response = restTemplate.exchange(WHISPIR_API_URL, HttpMethod.POST, entity, String.class, apiKey);
 		System.out.println("Whispir response is " + response.getBody());
 		
+	}
+	
+	public void sendSMS(String phoneNumber, String templateId, String body) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Content-Type", "application/vnd.whispir.message-v1+json");
+		headers.set("Authorization", "Basic " + authUser);
 		
+		JSONObject request = new JSONObject();
+		request.put("to", phoneNumber);
+		request.put("messageTemplateId", templateId);
+		request.put("body", body);
+
+		HttpEntity<String> entity = new HttpEntity<String>(request.toJSONString(), headers);
+
+		ResponseEntity<String> response = restTemplate.exchange(WHISPIR_API_URL, HttpMethod.POST, entity, String.class, apiKey);
+		System.out.println("Whispir response is " + response.getBody());
 	}
 }

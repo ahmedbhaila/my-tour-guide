@@ -1,6 +1,7 @@
 package com.mycompany;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,24 +64,52 @@ public class GooglePlaceService {
 		}
 	}
 	
-	public void setupCityMonumentData(String latLng) {
-		String types = Arrays.asList(categoriesOfInterest).stream().collect(Collectors.joining("|"));
-		
+	private String getJsonStringValue(String json, String pattern) {
+		JSONArray array = JsonPath.read(json, pattern);
+		String value = "";
+		if(array != null && array.size() != 0) {
+			value = ((String)((JSONArray)JsonPath.read(json, pattern)).get(0));
+		}
+		return value;
+	}
+	
+	private String getJsonDoubleValue(String json, String pattern) {
+		return ((Double)((JSONArray)JsonPath.read(json, pattern)).get(0)).toString();
+	}
+	
+	private CityMonument generateCityMonumentData(String json) {
+		CityMonument monument = new CityMonument();
+		monument.setAddress(getJsonStringValue(json, "$..formatted_address"));
+		monument.setName(getJsonStringValue(json, "$..name"));
+		monument.setPhoneNumber(getJsonStringValue(json, "$..formatted_phone_number"));
+		monument.setUrl(getJsonStringValue(json, "$..url"));
+		monument.setLatLng(getJsonDoubleValue(json, "$..lat") + "," + getJsonDoubleValue(json, "$..lng"));
+		monument.setTypeIcon(getJsonStringValue(json, "$..icon"));
+		return monument;
+	}
+	
+	public List<CityMonument> getCityMonumentData(String latLng) {
+		//String types = Arrays.asList(categoriesOfInterest).stream().collect(Collectors.joining("|"));
+		String types = "points_of_interest";
 		// do a lookup on which monuments are around this lat,lng
 		String response = restTemplate.getForObject(GOOGLE_PLACE_RADAR_SEARCH_URL, String.class, latLng, "50", types, apiKey);
 		List<String> places = JsonPath.read(response, "$..place_id");
+		List<CityMonument> monuments = new LinkedList<CityMonument>();
 		
 		// get details from these monuments
 		places.forEach(	
 				place -> {
 					String responses = null;
-					responses = restTemplate.getForObject(GOOGLE_PLACE_DETAILS_URL, String.class, place);
+					responses = restTemplate.getForObject(GOOGLE_PLACE_DETAILS_URL, String.class, place, apiKey);
+					monuments.add(generateCityMonumentData(responses));
 				}
 		);
 		
 		
-		System.out.println("Response is " + response);
 		
+		
+		System.out.println("Response is " + response);
+		return monuments;
 		// hard-coding for now
 		// Chicago : millennium park, Willis Tower,  Michigan_Avenue_(Chicago)
 		// Karachi: Mazar-e-Quaid, Clifton Beach Karachi, Karachi University
