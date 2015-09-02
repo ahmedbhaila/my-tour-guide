@@ -58,7 +58,7 @@ public class PlacesServiceController {
 		messageService.sendWelcomeMessage(phoneNumber, name);
 	}
 	
-	@RequestMapping(value="/handleCallback", method = RequestMethod.POST)
+	@RequestMapping(value="/handleCallback", method = RequestMethod.GET)
 	@ResponseBody
 	public void handleCallback(@RequestBody String message, @RequestParam(required=false, defaultValue="false", value="auth") String auth) {
 		System.out.println("call backed message is " + message);
