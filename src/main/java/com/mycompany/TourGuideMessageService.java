@@ -17,6 +17,6 @@ public class TourGuideMessageService {
 	WhispirService whispirService;
 	
 	public void sendWelcomeMessage(String phone, String name) {
-		whispirService.sendSMS(phone, messageTemplateId, messageBody.replaceAll(NAME, name));
+		whispirService.sendSMS(phone, messageTemplateId, messageBody.replace(NAME, name));
 	}
 }
