@@ -55,6 +55,7 @@ public class WhispirService {
 		request.put("to", phoneNumber);
 		request.put("messageTemplateId", templateId);
 		request.put("body", body);
+		request.put("callbackId", "TourGuideCallback test");
 
 		HttpEntity<String> entity = new HttpEntity<String>(request.toJSONString(), headers);
 
