@@ -57,4 +57,10 @@ public class PlacesServiceController {
 	public void sendSMS(@PathVariable("name") String name, @PathVariable("phone_number") String phoneNumber) {
 		messageService.sendWelcomeMessage(phoneNumber, name);
 	}
+	
+	@RequestMapping(value="/handleCallback", method = RequestMethod.POST)
+	@ResponseBody
+	public void handleCallback(@RequestBody String message, @RequestParam(required=false, defaultValue="false", value="auth") String auth) {
+		System.out.println("call backed message is " + message);
+	}
 }
