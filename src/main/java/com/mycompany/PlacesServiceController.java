@@ -63,4 +63,10 @@ public class PlacesServiceController {
 	public void handleCallback(@RequestParam(required=false, defaultValue="false", value="auth") String auth) {
 		System.out.println("call backed");
 	}
+	
+	@RequestMapping(value="/handleCallback", method = RequestMethod.POST)
+	@ResponseBody
+	public void handleCallback(@RequestBody String message, @RequestParam(required=false, defaultValue="false", value="auth") String auth) {
+		System.out.println("call backed" + message);
+	}
 }
