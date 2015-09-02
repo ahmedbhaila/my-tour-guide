@@ -72,6 +72,11 @@ public class MyTourGuideApplication {
 		return http;
 	}
 	
+	@Bean
+	public TourGuideMessageService tourGuideService() {
+		return new TourGuideMessageService();
+	}
+	
     public static void main(String[] args) {
         SpringApplication.run(MyTourGuideApplication.class, args);
     }
