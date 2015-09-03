@@ -25,7 +25,7 @@ public class WhispirMessageReceiver {
 			// save this preference in datastore
 			
 			// send another text message to this user indicating their choice
-			whispirService.sendSMS(message.getSource().getVoice(), alertTemplate, "TourGuideCallback test", "You have chosen to receive alerts from your location");
+			whispirService.sendSMS(message.getSource().getVoice(), alertTemplate, null, "You have chosen to receive alerts from your location");
 			
 		}
 		
