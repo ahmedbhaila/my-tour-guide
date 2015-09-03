@@ -1,10 +1,12 @@
 package com.mycompany;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown=true)
-class ResponseMessage {
+class ResponseMessage implements Serializable {
 	public String getChannel() {
 		return channel;
 	}
@@ -33,7 +35,7 @@ class ResponseMessage {
 	String content;
 }
 @JsonIgnoreProperties(ignoreUnknown=true)
-class Source {
+class Source implements Serializable {
 	String name;
 	public String getName() {
 		return name;
@@ -63,7 +65,7 @@ class Source {
 }
 
 @JsonIgnoreProperties(ignoreUnknown=true)
-class CustomParameters {
+class CustomParameters implements Serializable {
 	String senderFullName;
 	String mm;
 	String yy;
@@ -178,7 +180,11 @@ class CustomParameters {
 	
 }
 @JsonIgnoreProperties(ignoreUnknown=true)
-public class WhispirCallbackMessage {
+public class WhispirCallbackMessage implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	String messageId;
 	String messageLocation;
 	

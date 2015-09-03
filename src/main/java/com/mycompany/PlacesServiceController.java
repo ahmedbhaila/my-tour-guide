@@ -72,6 +72,6 @@ public class PlacesServiceController {
 	@ResponseBody
 	public void handleCallback(@RequestBody WhispirCallbackMessage message, @RequestParam(required=false, defaultValue="false", value="auth") String auth) {
 		System.out.println("call backed" + message.toString());
-		rabbitTemplate.convertAndSend("registration-user", message);
+		rabbitTemplate.convertAndSend("WhispirMessageQueue", message);
 	}
 }
