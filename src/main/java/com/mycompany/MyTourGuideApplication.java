@@ -131,7 +131,7 @@ public class MyTourGuideApplication {
 
 	@Bean
 	public MessageListenerAdapter listenerAdapter(WhispirMessageReceiver receiver) {
-		return new MessageListenerAdapter(receiver, "handleMessage");
+		return new MessageListenerAdapter(receiver, "handleWhispirMessage");
 	}
 
 	public static void main(String[] args) {
