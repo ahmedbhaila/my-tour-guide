@@ -46,7 +46,7 @@ public class WhispirService {
 		
 	}
 	
-	public void sendSMS(String phoneNumber, String templateId, String body) {
+	public void sendSMS(String phoneNumber, String templateId, String callbackId, String body) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Content-Type", "application/vnd.whispir.message-v1+json");
 		headers.set("Authorization", "Basic " + authUser);
@@ -55,7 +55,9 @@ public class WhispirService {
 		request.put("to", phoneNumber);
 		request.put("messageTemplateId", templateId);
 		request.put("body", body);
-		request.put("callbackId", "TourGuideCallback test");
+		if(callbackId != null) {
+			request.put("callbackId", "TourGuideCallback test");
+		}
 
 		HttpEntity<String> entity = new HttpEntity<String>(request.toJSONString(), headers);
 
