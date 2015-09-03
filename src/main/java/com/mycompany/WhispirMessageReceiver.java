@@ -10,6 +10,8 @@ public class WhispirMessageReceiver {
 	public void handleWhispirMessage(WhispirCallbackMessage message) {
 		String content = message.getResponseMessage().getContent();
 		
+		System.out.println("Hello, I received content " + content);
+		
 		if(content.equals("1")) {
 			// user wants to register to receive alerts
 		}
