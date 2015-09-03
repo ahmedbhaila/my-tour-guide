@@ -2,6 +2,7 @@ package com.mycompany;
 
 import java.util.List;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,9 @@ public class PlacesServiceController {
 	
 	@Autowired
 	TourGuideMessageService messageService;
+	
+	@Autowired
+	RabbitTemplate rabbitTemplate;
 	
 	
 	@RequestMapping("/places/{city}")
@@ -66,7 +70,8 @@ public class PlacesServiceController {
 	
 	@RequestMapping(value="/handleCallback", method = RequestMethod.POST)
 	@ResponseBody
-	public void handleCallback(@RequestBody String message, @RequestParam(required=false, defaultValue="false", value="auth") String auth) {
+	public void handleCallback(@RequestBody WhispirCallbackMessage message, @RequestParam(required=false, defaultValue="false", value="auth") String auth) {
 		System.out.println("call backed" + message.toString());
+		rabbitTemplate.convertAndSend("registration-user", message);
 	}
 }

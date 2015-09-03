@@ -62,4 +62,13 @@ public class WhispirService {
 		ResponseEntity<String> response = restTemplate.exchange(WHISPIR_API_URL, HttpMethod.POST, entity, String.class, apiKey);
 		System.out.println("Whispir response is " + response.getBody());
 	}
+	
+	public void handleMessage(WhispirCallbackMessage message) {
+		String content = message.getResponseMessage().getContent();
+		if(content.equals("1")) {
+			// user wants to subscribe to alerts
+		}
+	}
+	
+	
 }
