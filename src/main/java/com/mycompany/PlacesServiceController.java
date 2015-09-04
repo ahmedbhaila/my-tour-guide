@@ -58,8 +58,14 @@ public class PlacesServiceController {
 	
 	@RequestMapping("/sms/welcome/{name}/{phone_number}")
 	@ResponseBody
-	public void sendSMS(@PathVariable("name") String name, @PathVariable("phone_number") String phoneNumber) {
+	public void sendWelcomeMessage(@PathVariable("name") String name, @PathVariable("phone_number") String phoneNumber) {
 		messageService.sendWelcomeMessage(phoneNumber, name);
+	}
+	
+	@RequestMapping("/sms/message/{name}/{phone_number}")
+	@ResponseBody
+	public void sendMessage(@PathVariable("name") String name, @PathVariable("phone_number") String phoneNumber) {
+		messageService.sendGenericMessage(phoneNumber, name);
 	}
 	
 	@RequestMapping(value="/handleCallback", method = RequestMethod.GET)
