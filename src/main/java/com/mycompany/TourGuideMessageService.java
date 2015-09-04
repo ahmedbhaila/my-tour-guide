@@ -27,7 +27,7 @@ public class TourGuideMessageService {
 	public void sendGenericMessage(String phone, String message) {
 		String alert = (String) redisTemplate.opsForHash().get("subscriber:" + phone, "alerts");
 		if(alert.equals("true")) {
-			whispirService.sendSMS(phone, messageTemplateId, null, message);
+			whispirService.sendSMS(phone, messageTemplateId, "TourGuideCallback test", message);
 		}
 	}
 }
