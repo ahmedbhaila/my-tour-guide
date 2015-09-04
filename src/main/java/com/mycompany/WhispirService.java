@@ -21,6 +21,7 @@ public class WhispirService {
 	@Value("${whispir.message.template.name}")
 	String messageTemplateName;
 	
+	
 	@Autowired
 	RestTemplate restTemplate;
 	
@@ -56,7 +57,7 @@ public class WhispirService {
 		request.put("messageTemplateId", templateId);
 		request.put("body", body);
 		if(callbackId != null) {
-			request.put("callbackId", "TourGuideCallback test");
+			request.put("callbackId", callbackId);
 		}
 
 		HttpEntity<String> entity = new HttpEntity<String>(request.toJSONString(), headers);

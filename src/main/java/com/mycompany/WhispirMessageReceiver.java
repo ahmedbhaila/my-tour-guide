@@ -15,6 +15,9 @@ public class WhispirMessageReceiver {
 	@Value("${whispir.message.template.confirm.alert}")
 	String alertTemplate;
 	
+	@Value("${whispir.callback.id}")
+	String callbackId;
+	
 	@Autowired
 	RedisTemplate<String, String> redisTemplate;
 	
@@ -29,13 +32,13 @@ public class WhispirMessageReceiver {
 			redisTemplate.opsForHash().put("subscriber:" + message.getSource().getVoice(), "alerts", "true");
 			
 			// send another text message to this user indicating their choice
-			whispirService.sendSMS(message.getSource().getVoice(), alertTemplate, null, "You have chosen to receive alerts from your location, if you ever want to stop receiving alert just type STOP and send to this number");
+			whispirService.sendSMS(message.getSource().getVoice(), alertTemplate, callbackId, "You have chosen to receive alerts from your location, if you ever want to stop receiving alert just type STOP and send to this number");
 			
 		}
 		
-		else if(content.equalsIgnoreCase("stop")) {
+		else if(content.equalsIgnoreCase("stp")) {
 			// user wants to stop receiving alerts
-			whispirService.sendSMS(message.getSource().getVoice(), alertTemplate, null, "We have received your request to not send alerts anymore, if you would like to receive alerts again please type SUB and send to this number");
+			whispirService.sendSMS(message.getSource().getVoice(), alertTemplate, callbackId, "We have received your request to not send alerts anymore, if you would like to receive alerts again please type SUB and send to this number");
 			
 			// save this preference in datastore
 			redisTemplate.opsForHash().put("subscriber:" + message.getSource().getVoice(), "alerts", "false");

@@ -14,6 +14,9 @@ public class TourGuideMessageService {
 	@Value("${welcome.message.body}")
 	String messageBody;
 	
+	@Value("${whispir.callback.id}")
+	String whispirCallbackId;
+	
 	@Autowired
 	WhispirService whispirService;
 	
@@ -21,13 +24,13 @@ public class TourGuideMessageService {
 	RedisTemplate<String, String> redisTemplate;
 	
 	public void sendWelcomeMessage(String phone, String name) {
-		whispirService.sendSMS(phone, messageTemplateId, "TourGuideCallback test", messageBody.replace(NAME, name));
+		whispirService.sendSMS(phone, messageTemplateId, whispirCallbackId, messageBody.replace(NAME, name));
 	}
 	
 	public void sendGenericMessage(String phone, String message) {
 		String alert = (String) redisTemplate.opsForHash().get("subscriber:" + phone, "alerts");
 		if(alert.equals("true")) {
-			whispirService.sendSMS(phone, messageTemplateId, "TourGuideCallback test", message);
+			whispirService.sendSMS(phone, messageTemplateId, whispirCallbackId, message);
 		}
 	}
 }
