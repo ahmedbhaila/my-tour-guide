@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1"> 
+<meta charset="utf-8">
+
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
+<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+
+<link href="css/test.css"></link>
+
+
+<title>My Tour Guide</title>
+
+
+<script type="text/javascript">
+	
+	var monuments = [];
+	
+	//var lat_lng = new google.maps.LatLng(24.8484681, 67.00376310000001);
+	
+	var lat_lng = "24.8484681, 67.00376310000001";
+	
+	function getMonuments() {
+		var url = "/places/" + lat_lng +"/data/monuments";
+		$.get(url, function(data) {
+			console.log(data);
+			monuments = data;
+			callback(data)
+		});
+	}
+
+	function callback(results) {
+		console.log(results.length);
+		
+		$(".monuments").html('<fieldset data-role="controlgroup"></fieldset>');
+		for (var i = 0; i < results.length; i++) {
+			//$(".monuments").append("<label><input type='checkbox' name='checkbox[]' />"+results[i].name+"</label>");
+			$("fieldset").append('<label><input type="checkbox" name="checkbox[]" />'+results[i].name+'</label>');
+		}
+		
+		$(".monuments").trigger('create');
+		//$("[type=checkbox]").checkboxradio();
+		//$("[data-role=controlgroup]").controlgroup("refresh");
+	}
+	
+	
+	$( document ).ready(function() {
+
+		//var lat_lng = new google.maps.LatLng(24.848702799999, 67.0036843);
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(function(position) {
+				lat_lng = position.coords.latitude+","+position.coords.longitude;
+				getMonuments();
+			}, function() {
+				//console.log('Error occurred');
+				getMonuments();
+			});
+			
+		} else {
+			getMonuments();
+		}
+	
+
+		$('#srch-term').keydown(function(e) {
+			if (e.keyCode == 13) {
+				e.preventDefault();
+				$("#btn_search").click();
+			}
+		})
+
+		$("#btn_search").click(function() {
+			var url = "/places/search/" + $("#srch-term").val();
+			$.get(url, function(data) {
+				console.log(data);
+				callback(data);
+			});
+			return true;
+		});
+	
+		
+		$("#tag").click(function(){
+			
+			var data = [];
+			for (i = 0; i < $("[type=checkbox]").length; i++) {
+				if ($("[type=checkbox]")[i].checked) {
+					console.log(monuments[i]);
+					data.push(monuments[i]);
+				}
+			}
+			
+			if(data.length > 0)
+			{
+				$.ajax({
+					  type: "POST",
+					  url: "/places/" + lat_lng +"/data/monuments",
+					  contentType: "application/json; charset=utf-8",
+					  dataType: "json",
+					  data: JSON.stringify(data),
+					  success: function(response){
+						  console.log(response);
+					  },
+					  
+					});
+			}
+			
+			return false;
+
+		});
+
+	});
+
+	
+
+	
+	
+</script>
+
+<style>
+.monuments .ui-controlgroup-controls {
+	float: none;
+}
+</style>
+
+
+</head>
+<body>
+	<div data-role="page">
+
+	<div data-role="header">
+		<h1>My Tour Guide</h1>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+		<div class="monuments" data-role="fieldcontain" align="center">
+		</div>
+		<br/><hr/>
+		<button id="tag" data-inline="true" data-theme="a" data-icon="check">Tag Monuments</button>	
+		<hr/>	
+	</div><!-- /content -->
+
+</div><!-- /page -->
+
+</body>
+
+</html>
