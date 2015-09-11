@@ -57,7 +57,7 @@ public class PlacesServiceController {
 	@RequestMapping("/ivr/{phone_number}")
 	@ResponseBody
 	public void makeCall(@PathVariable("phone_number") String phoneNumber) {
-		//messageService.sendVoiceCall(phoneNumber);
+		messageService.sendVoiceCall(phoneNumber);
 	}
 	
 	@RequestMapping("/sms/welcome/{name}/{phone_number}")

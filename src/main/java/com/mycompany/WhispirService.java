@@ -39,7 +39,16 @@ public class WhispirService {
 		JSONObject request = new JSONObject();
 		request.put("to", phoneNumber);
 		request.put("messageTemplateName", messageTemplateName);
+		JSONObject voiceRequest = new JSONObject();
+		
+		voiceRequest.put("header", "This is the introduction, read out prior to any key press");
+		voiceRequest.put("type", "ConfCall:,ConfAccountNo:,ConfPinNo:,ConfModPinNo:,Pin:");
+		
+		voiceRequest.put("body", "Chicago  is the third most populous city in the United States. With over 2.7 million residents, it is the most populous city " + 
+		"in the state of Illinois and the Midwest. The Chicago metropolitan area, often referred to as Chicagoland, is home to nearly 10 million people and " + 
+				"is the third-largest in the U.S.[4] Chicago is the seat of Cook County");
 
+		request.put("voice", voiceRequest);
 		HttpEntity<String> entity = new HttpEntity<String>(request.toJSONString(), headers);
 
 		ResponseEntity<String> response = restTemplate.exchange(WHISPIR_API_URL, HttpMethod.POST, entity, String.class, apiKey);

@@ -30,18 +30,29 @@ public class PlacesService {
 	}
 	
 	public List<CityMonument> getCityMonumentData(String latLng) {
-		return placeService.getCityMonumentData(latLng);
+		List<CityMonument> monuments = placeService.getCityMonumentData(latLng);
+		monuments.stream().forEach(m -> {
+				String name = (String) redisTemplate.opsForHash().get(m.getName(), "name");
+				if(name != null && !name.equals("")) {
+					m.setTagged(true);
+				}
+				else {
+					m.setTagged(false);
+				}
+			}
+		);
+		return monuments;
 	}
 	
 	public void saveMonuments(String latLng, List<CityMonument> monuments) {
 		monuments.forEach(monument ->
 			{
-				redisTemplate.opsForHash().put(latLng + ":monument:" + monument.getName(), "address", monument.getAddress());
-				redisTemplate.opsForHash().put(latLng + ":monument:" + monument.getName(), "latLng", monument.getLatLng());
-				redisTemplate.opsForHash().put(latLng + ":monument:" + monument.getName(), "name", monument.getName());
-				redisTemplate.opsForHash().put(latLng + ":monument:" + monument.getName(), "phoneNumber", monument.getPhoneNumber());
-				redisTemplate.opsForHash().put(latLng + ":monument:" + monument.getName(), "typeIcon", monument.getTypeIcon());
-				redisTemplate.opsForHash().put(latLng + ":monument:" + monument.getName(), "url", monument.getUrl());
+				redisTemplate.opsForHash().put(monument.getName(), "address", monument.getAddress());
+				redisTemplate.opsForHash().put(monument.getName(), "latLng", monument.getLatLng());
+				redisTemplate.opsForHash().put(monument.getName(), "name", monument.getName());
+				redisTemplate.opsForHash().put(monument.getName(), "phoneNumber", monument.getPhoneNumber());
+				redisTemplate.opsForHash().put(monument.getName(), "typeIcon", monument.getTypeIcon());
+				redisTemplate.opsForHash().put(monument.getName(), "url", monument.getUrl());
 			}
 		);
 	}

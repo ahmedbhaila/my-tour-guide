@@ -7,6 +7,13 @@ public class CityMonument {
 	protected String name;
 	protected String url;
 	protected String typeIcon;
+	protected boolean tagged;
+	public boolean isTagged() {
+		return tagged;
+	}
+	public void setTagged(boolean tagged) {
+		this.tagged = tagged;
+	}
 	public String getTypeIcon() {
 		return typeIcon;
 	}

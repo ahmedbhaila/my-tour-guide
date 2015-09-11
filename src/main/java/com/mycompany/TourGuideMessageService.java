@@ -33,4 +33,8 @@ public class TourGuideMessageService {
 			whispirService.sendSMS(phone, messageTemplateId, whispirCallbackId, message);
 		}
 	}
+	
+	public void sendVoiceCall(String phone) {
+		whispirService.sendVoiceCall(phone);
+	}
 }
