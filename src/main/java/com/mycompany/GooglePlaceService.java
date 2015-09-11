@@ -1,8 +1,10 @@
 package com.mycompany;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import net.minidev.json.JSONArray;
@@ -10,6 +12,8 @@ import net.minidev.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import com.jayway.jsonpath.JsonPath;
@@ -31,6 +35,9 @@ public class GooglePlaceService {
 	private static final String WIKIPEDIA_API_URL = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles={title}";
 	private static final String GOOGLE_PLACE_RADAR_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/radarsearch/json?location={lat_lng}&radius={radius}&types={types}&key={api_key}";
 	private static final String GOOGLE_PLACE_DETAILS_URL = "https://maps.googleapis.com/maps/api/place/details/json?placeid={place_id}&key={key}";
+	private static final String GOOGLE_PLACES_API_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={location}&radius={radius}&key={key}";
+	
+	
 	
 	private static final String[] categoriesOfInterest = new String[] {
 		"airport", "amusement_park", "aquarium", "art_gallery","casino", "zoo", "shopping_mall", "museum"
@@ -86,6 +93,17 @@ public class GooglePlaceService {
 		monument.setLatLng(getJsonDoubleValue(json, "$..lat") + "," + getJsonDoubleValue(json, "$..lng"));
 		monument.setTypeIcon(getJsonStringValue(json, "$..icon"));
 		return monument;
+	}
+	
+	public List<String> getPlaces(String latLng) {
+		ResponseEntity<String> results = restTemplate.getForEntity(GOOGLE_PLACES_API_URL, String.class, latLng, 50, apiKey);
+		List<String> places = null;
+		if(results.getStatusCode().equals(HttpStatus.OK)) {
+			String response = results.getBody();
+			List<String> placeNames = JsonPath.read(response, "$..name");
+			places = placeNames.stream().filter(p -> redisTemplate.opsForHash().get(p, "name") != null).collect(Collectors.toList());
+		}
+		return places;
 	}
 	
 	public List<CityMonument> getCityMonumentData(String latLng) {

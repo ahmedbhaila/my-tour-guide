@@ -54,6 +54,17 @@ public class PlacesServiceController {
 		placeService.saveMonuments(latLng, monuments);
 	}
 	
+	@RequestMapping("/places/{lat_lng:.+}/tagged")
+	public List<String> hasDocument(@PathVariable("lat_lng") String latLng, @RequestParam("profile") String profileName,
+			@RequestParam("time") String timeInMillis, @RequestParam("timezone") String timeZone) {
+		return placeService.findTaggedPlaces(profileName, latLng, timeInMillis, timeZone);
+	}
+	
+	@RequestMapping("/places/visited")
+	public List<String> visitedPlaces(@RequestParam("profile") String profileName) {
+		return placeService.getVisitedPlaces(profileName);
+	}
+	
 	@RequestMapping("/ivr/{phone_number}")
 	@ResponseBody
 	public void makeCall(@PathVariable("phone_number") String phoneNumber) {

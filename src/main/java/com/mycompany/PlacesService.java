@@ -57,4 +57,22 @@ public class PlacesService {
 		);
 	}
 	
+	public List<String> findTaggedPlaces(String profileName, String latLng, String timeInMillis, String timeZone) {
+		List<String> places = placeService.getPlaces(latLng);
+		
+		// save this place data to user profile
+		places.forEach(p -> redisTemplate.opsForList().leftPush(profileName + ":places", p));
+		places.forEach(p -> {
+			redisTemplate.opsForHash().put(profileName + ":" + p, "datetime", timeInMillis);
+			redisTemplate.opsForHash().put(profileName + ":" + p, "timezone", timeZone);
+		});
+		
+		
+		return places;
+	}
+	
+	public List<String> getVisitedPlaces(String profileName) {
+		return redisTemplate.opsForList().range(profileName + ":places", 0, -1);
+	}
+	
 }
