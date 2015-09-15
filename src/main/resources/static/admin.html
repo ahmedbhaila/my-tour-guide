@@ -9,6 +9,19 @@
 <script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
 <script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
 
+<script src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initAutocomplete" async defer></script>
+ 
+        
+<!-- <!-- Latest compiled and minified CSS -->
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"> -->
+
+<!-- Optional theme -->
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"> -->
+
+<!-- Latest compiled and minified JavaScript -->
+<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> -->
+<!--  --> -->
+
 <link href="css/test.css"></link>
 
 
@@ -18,18 +31,24 @@
 <script type="text/javascript">
 	
 	var monuments = [];
+	var autocomplete;
 	
 	//var lat_lng = new google.maps.LatLng(24.8484681, 67.00376310000001);
 	
 	var lat_lng = "24.8484681, 67.00376310000001";
 	
-	function getMonuments() {
-		var url = "/places/" + lat_lng +"/data/monuments";
+	function getMonuments(latlng) {
+		var url = "/places/" + latlng +"/data/monuments";
+		$.mobile.loading("show");
 		$.get(url, function(data) {
 			console.log(data);
 			monuments = data;
 			callback(data)
+		})
+		.always(function() {
+			 $.mobile.loading("hide");
 		});
+		
 	}
 
 	function callback(results) {
@@ -38,7 +57,10 @@
 		$(".monuments").html('<fieldset data-role="controlgroup"></fieldset>');
 		for (var i = 0; i < results.length; i++) {
 			//$(".monuments").append("<label><input type='checkbox' name='checkbox[]' />"+results[i].name+"</label>");
-			$("fieldset").append('<label><input type="checkbox" name="checkbox[]" />'+results[i].name+'</label>');
+			
+			var item = '<label><input type="checkbox" name="checkbox[]" '+ (results[i].tagged ?'disabled="disabled" checked="checked"' : '') +'/>'+results[i].name+'</label>';
+			
+			$("fieldset").append(item);
 		}
 		
 		$(".monuments").trigger('create');
@@ -53,16 +75,20 @@
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(function(position) {
 				lat_lng = position.coords.latitude+","+position.coords.longitude;
-				getMonuments();
+				getMonuments(lat_lng);
 			}, function() {
 				//console.log('Error occurred');
-				getMonuments();
+				getMonuments(lat_lng);
 			});
 			
 		} else {
-			getMonuments();
+			getMonuments(lat_lng);
 		}
 	
+		
+		
+		  
+		  
 
 		$('#srch-term').keydown(function(e) {
 			if (e.keyCode == 13) {
@@ -85,7 +111,7 @@
 			
 			var data = [];
 			for (i = 0; i < $("[type=checkbox]").length; i++) {
-				if ($("[type=checkbox]")[i].checked) {
+				if ($("[type=checkbox]")[i].checked && !$("[type=checkbox]")[i].disabled) {
 					console.log(monuments[i]);
 					data.push(monuments[i]);
 				}
@@ -93,16 +119,26 @@
 			
 			if(data.length > 0)
 			{
+				$.mobile.loading("show");
 				$.ajax({
 					  type: "POST",
 					  url: "/places/" + lat_lng +"/data/monuments",
 					  contentType: "application/json; charset=utf-8",
 					  dataType: "json",
 					  data: JSON.stringify(data),
-					  success: function(response){
-						  console.log(response);
-					  },
 					  
+					  
+					})
+					.success( function(response){
+						  console.log(response);
+						  					 
+					})
+					.always(function(response) {
+						console.log(response);						
+						$.mobile.loading("hide");
+						
+						if(response.status == 200)
+							getMonuments(lat_lng);
 					});
 			}
 			
@@ -112,29 +148,61 @@
 
 	});
 
-	
+	function initAutocomplete() {
+		
+		  autocomplete = new google.maps.places.Autocomplete(document.getElementById('text-search'),{types: ['geocode']});
+		  
+		  // When the user selects an address from the dropdown, populate the address
+		  // fields in the form.
+		  autocomplete.addListener('place_changed', getPlaceDetail);
+		}
 
+		function getPlaceDetail() {
+		  // Get the place details from the autocomplete object.
+		  var place = autocomplete.getPlace();
+		  lat_lng = place.geometry.location.lat()+","+place.geometry.location.lng();
+		  
+		  getMonuments(lat_lng);
+		}
 	
 	
 </script>
 
+
 <style>
 .monuments .ui-controlgroup-controls {
 	float: none;
+}
+
+.ui-header
+{
+	background-color: #38c !important;
+	color: black !important;
 }
 </style>
 
 
 </head>
 <body>
-	<div data-role="page">
+	<div data-role="page" data-theme="a">
 
 	<div data-role="header">
 		<h1>My Tour Guide</h1>
 	</div><!-- /header -->
-
+	
 	<div data-role="content" data-theme="a">	
+		<hr/>
+			<input name="text-search" id="text-search" value="" placeholder="Enter your address" type="text">	
+		<hr/>
 		<div class="monuments" data-role="fieldcontain" align="center">
+		
+		<!-- <fieldset data-role="controlgroup">
+			<label><input type='checkbox' name='checkbox[]' />df dsfdsf ds</label>
+			<label><input type='checkbox' name='checkbox[]' />df dsfdsf ds</label>
+			<label><input type='checkbox' name='checkbox[]' />df dsfdsf ds</label>
+			<label><input type='checkbox' name='checkbox[]' />df dsfdsf ds</label>
+			<label><input type='checkbox' name='checkbox[]' />df dsfdsf ds</label>
+		</fieldset> -->
 		</div>
 		<br/><hr/>
 		<button id="tag" data-inline="true" data-theme="a" data-icon="check">Tag Monuments</button>	
