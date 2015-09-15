@@ -1,5 +1,7 @@
 package com.mycompany;
 
+import java.util.List;
+
 import net.minidev.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+
+import scala.annotation.meta.getter;
 
 public class WhispirService {
 	
@@ -82,5 +86,61 @@ public class WhispirService {
 		}
 	}
 	
+	public void sendVoiceCall(String phoneNumber, List<CityMonument> monuments) {
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Content-Type", "application/vnd.whispir.message-v1+json");
+		headers.set("Authorization", "Basic " + authUser);
+		
+		JSONObject request = new JSONObject();
+		request.put("to", phoneNumber);
+		request.put("messageTemplateName", messageTemplateName);
+		JSONObject voiceRequest = new JSONObject();
+		
+		if(monuments.size() == 1) {
+			voiceRequest.put("header", "We found a place that might interest you");
+		}
+		else {
+			voiceRequest.put("header", "We found places that might interest you");	
+		}
+		voiceRequest.put("type", "ConfCall:,ConfAccountNo:,ConfPinNo:,ConfModPinNo:,Pin:");
+		String body = "";
+		for (CityMonument cityMonument : monuments) {
+			body += cityMonument.getName()  + " is located at " + cityMonument.getAddress();
+		}
+		
+		voiceRequest.put("body", body);
+
+		request.put("voice", voiceRequest);
+		HttpEntity<String> entity = new HttpEntity<String>(request.toJSONString(), headers);
+
+		ResponseEntity<String> response = restTemplate.exchange(WHISPIR_API_URL, HttpMethod.POST, entity, String.class, apiKey);
+		System.out.println("Whispir response is " + response.getBody());
+		
+	}
+	public void sendSMS(String phoneNumber, String templateId, String callbackId, List<CityMonument> monuments) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Content-Type", "application/vnd.whispir.message-v1+json");
+		headers.set("Authorization", "Basic " + authUser);
+		
+		JSONObject request = new JSONObject();
+		request.put("to", phoneNumber);
+		request.put("messageTemplateId", templateId);
+		
+		String body = "";
+		for (CityMonument cityMonument : monuments) {
+			body += cityMonument.getName()  + " is located at " + cityMonument.getAddress();
+		}
+		
+		request.put("body", body);
+		if(callbackId != null) {
+			request.put("callbackId", callbackId);
+		}
+
+		HttpEntity<String> entity = new HttpEntity<String>(request.toJSONString(), headers);
+
+		ResponseEntity<String> response = restTemplate.exchange(WHISPIR_API_URL, HttpMethod.POST, entity, String.class, apiKey);
+		System.out.println("Whispir response is " + response.getBody());
+	}
 	
 }

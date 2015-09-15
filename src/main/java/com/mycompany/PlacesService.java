@@ -60,8 +60,12 @@ public class PlacesService {
 	public List<String> findTaggedPlaces(String profileName, String latLng, String timeInMillis, String timeZone) {
 		List<String> places = placeService.getPlaces(latLng);
 		
-		// save this place data to user profile
+		
+		// save this place data to user profile for history
+		// also save an instance under current_places
 		places.forEach(p -> redisTemplate.opsForList().leftPush(profileName + ":places", p));
+		redisTemplate.delete(profileName + ":places_current");
+		places.forEach(p -> redisTemplate.opsForList().leftPush(profileName + ":places_current", p));
 		places.forEach(p -> {
 			redisTemplate.opsForHash().put(profileName + ":" + p, "datetime", timeInMillis);
 			redisTemplate.opsForHash().put(profileName + ":" + p, "timezone", timeZone);
