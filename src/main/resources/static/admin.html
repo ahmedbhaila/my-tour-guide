@@ -20,7 +20,7 @@
 
 <!-- Latest compiled and minified JavaScript -->
 <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> -->
-<!--  --> -->
+<!--  --> 
 
 <link href="css/test.css"></link>
 
@@ -32,6 +32,7 @@
 	
 	var monuments = [];
 	var autocomplete;
+	var monuments_desc_id = 0;
 	
 	//var lat_lng = new google.maps.LatLng(24.8484681, 67.00376310000001);
 	
@@ -53,14 +54,18 @@
 
 	function callback(results) {
 		console.log(results.length);
-		
-		$(".monuments").html('<fieldset data-role="controlgroup"></fieldset>');
+		$("#places").html('');
+		//$(".monuments").html('<fieldset data-role="controlgroup"></fieldset>');
 		for (var i = 0; i < results.length; i++) {
 			//$(".monuments").append("<label><input type='checkbox' name='checkbox[]' />"+results[i].name+"</label>");
 			
-			var item = '<label><input type="checkbox" name="checkbox[]" '+ (results[i].tagged ?'disabled="disabled" checked="checked"' : '') +'/>'+results[i].name+'</label>';
+			//var item = '<label><input type="checkbox" name="checkbox[]" '+ (results[i].tagged ?'disabled="disabled" checked="checked"' : '') +'/>'+results[i].name+'</label>';
 			
-			$("fieldset").append(item);
+			var item = 
+					'<div  class="ui-block-a"> <label><input type="checkbox" name="checkbox[]" '+ (results[i].tagged ?'disabled="disabled" checked="checked"' : '') +'/>'+results[i].name+'</label></div>'+
+	            	'<div  class="ui-block-b"> <a id="desc_'+i+'" href="#popup" data-transition="pop" data-rel="dialog" class="ui-btn ui-icon-info ui-btn-icon-notext ui-corner-all">No text</a></div>';
+			
+			$("#places").append(item);
 		}
 		
 		$(".monuments").trigger('create');
@@ -85,9 +90,15 @@
 			getMonuments(lat_lng);
 		}
 	
+		$("#places").on('click','.ui-btn-icon-notext',function(){
+			monuments_desc_id = this.id;
+			var id = monuments_desc_id.split('_')[1];
+			$("#txt_description").val(monuments[id].url);
+		});
 		
-		
-		  
+		$('.ui-btn-icon-notext').click(function(){
+			console.log(this.id);
+		});
 		  
 
 		$('#srch-term').keydown(function(e) {
@@ -106,6 +117,33 @@
 			return true;
 		});
 	
+		
+		$("#save_button").click(function(){
+			console.log(monuments_desc_id);
+			var id = monuments_desc_id.split('_')[1];
+			monuments[id].url = $("#txt_description").val();			
+			if(monuments[id].tagged){
+				var data = [];
+				data.push(monuments[id]);
+				$.mobile.loading("show");
+				$.ajax({
+					  type: "POST",
+					  url: "/places/" + lat_lng +"/data/monuments",
+					  contentType: "application/json; charset=utf-8",
+					  dataType: "json",
+					  data: JSON.stringify(data),
+					})
+					.success( function(response){
+						  console.log(response);						  					 
+					})
+					.always(function(response) {
+						console.log(response);						
+						$.mobile.loading("hide");											
+					});
+				
+			}
+		});
+		
 		
 		$("#tag").click(function(){
 			
@@ -179,6 +217,13 @@
 	background-color: #38c !important;
 	color: black !important;
 }
+.ui-grid-a .ui-block-a {
+    width: 90% !important;
+}
+
+.ui-grid-a .ui-block-b {
+    width: 20px !important;    
+}
 </style>
 
 
@@ -188,7 +233,7 @@
 
 	<div data-role="header">
 		<h1>My Tour Guide</h1>
-	</div><!-- /header -->
+	</div>
 	
 	<div data-role="content" data-theme="a">	
 		<hr/>
@@ -196,20 +241,37 @@
 		<hr/>
 		<div class="monuments" data-role="fieldcontain" align="center">
 		
-		<!-- <fieldset data-role="controlgroup">
-			<label><input type='checkbox' name='checkbox[]' />df dsfdsf ds</label>
-			<label><input type='checkbox' name='checkbox[]' />df dsfdsf ds</label>
-			<label><input type='checkbox' name='checkbox[]' />df dsfdsf ds</label>
-			<label><input type='checkbox' name='checkbox[]' />df dsfdsf ds</label>
-			<label><input type='checkbox' name='checkbox[]' />df dsfdsf ds</label>
-		</fieldset> -->
+			<div class="ui-grid-a" id="places">
+				<!-- <div  class="ui-block-a" >
+	                <label><input type='checkbox' name='checkbox[]' />df dsfdsf ds</label>
+	            </div>
+	            <div  class="ui-block-b" >                        
+	                <a href="#popup" data-transition="pop" data-rel="dialog" class="ui-btn ui-icon-info ui-btn-icon-notext ui-corner-all">No text</a>						
+	            </div> -->			
+			</div>
+			<br/><hr/>
+			<button id="tag" data-inline="true" data-theme="a" data-icon="check">Tag Monuments</button>	
+			<hr/>	
 		</div>
-		<br/><hr/>
-		<button id="tag" data-inline="true" data-theme="a" data-icon="check">Tag Monuments</button>	
-		<hr/>	
-	</div><!-- /content -->
+	</div>
+	
+	
 
-</div><!-- /page -->
+</div>
+
+
+<div id="popup" data-role="dialog" data-url="popup" data-close-btn="right">
+	<div data-role="header"><h3>Monument Description</h3></div>
+	<div role="main" class="ui-content">
+		<textarea placeholder="Enter URL or description" cols="40" rows="8" name="textarea" id="txt_description"></textarea>
+	</div>
+	<div data-role="footer">
+		<a href="#" id="save_button" data-rel="back" data-inline="true" data-theme="a" data-icon="check">Save</a>
+	    <a href="#" id="cancel_button" data-rel="back" data-inline="true" data-theme="a" data-icon="back">Cancel</a>
+	</div>
+</div>	
+		
+
 
 </body>
 
